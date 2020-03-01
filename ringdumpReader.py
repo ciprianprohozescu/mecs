@@ -1,22 +1,52 @@
 import json
 from datetime import datetime
 
-parsedRingdump = open('parsedRingdump.txt', 'w+')
+keys = []
+key_names = []
+totalEvents = 0
 
-with open('ringdump.json', 'r') as ringdump:
-    event = ringdump.readline()
-    count = 1
+print()
+print()
 
-    while event:
-        parsedEvent = json.loads(event)
-        if 'time' in parsedEvent:
-            parsedEvent['time'] = datetime.utcfromtimestamp(parsedEvent['time']).strftime('%Y-%m-%d %H:%M:%S')
+with open('../ringdump.json', 'r') as ringdump:
+    line = ringdump.readline()
 
-        for key in parsedEvent:
-            parsedRingdump.write(f'{key}: {parsedEvent[key]}\n')
-        parsedRingdump.write('\n')
+    while line and totalEvents <= 50000:
+        event = json.loads(line)
 
-        event = ringdump.readline()
-        count += 1
+        for key in event:
+            if key == '_id':
+                continue
+            if key in key_names:
+                index = key_names.index(key)
+                keys[index]['appearances'] += 1
+                if event[key] not in keys[index]['values']:
+                    keys[index]['values'].append(event[key])
+            else:
+                key_names.append(key)
+                keys.append({
+                    'name': key,
+                    'appearances': 1,
+                    'values': [event[key]]
+                })
 
-parsedRingdump.close()
+        line = ringdump.readline()
+        totalEvents += 1
+
+for key in keys:
+    percentile = float(key['appearances']) / totalEvents * 100.0
+    name = key['name']
+    valuesNo = len(key['values'])
+
+    print(f'{name} ({percentile}%): ', end = '')
+
+    if valuesNo > 10:
+        print(f'{valuesNo} values')
+    else:
+        for value in key['values']:
+            print(value, end = ' ')
+        print()
+    print()
+
+print()
+print()
