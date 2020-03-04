@@ -15,6 +15,7 @@ class DBConnection:
         try:
             cursor = self.connection.cursor()
             cursor.execute(sql)
+            self.connection.commit()
         except Error as e:
             print(e)
 
