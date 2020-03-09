@@ -64,7 +64,7 @@ event['id'] = db_events[0][0]
 last_event = event
 line = ringdump.readline()
 
-while line and (total_events <= 1000):
+while line and (total_events <= 10000):
     event = json.loads(line)
 
     #if event is incomplete, ignore it
