@@ -3,7 +3,7 @@ from datetime import datetime
 from databaseHelper import DBConnection
 
 #SQL stuff
-db_file = r'../mecs.db'
+db_file = r'../../mecs.db'
 connection = DBConnection(db_file)
 
 def event_query(event):
@@ -38,7 +38,7 @@ def relation_update(event1, event2, relation):
     sql_update = f"""UPDATE event_relations SET count = {count}, time_average = {time_average} WHERE cause = '{event1['id']}' AND effect = '{event2['id']}';"""
     connection.execute_statement(sql_update)
 
-ringdump = open('../ringdump.json', 'r')
+ringdump = open('../../ringdump.json', 'r')
 
 #read the first event
 line = ringdump.readline()

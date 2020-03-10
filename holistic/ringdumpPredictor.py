@@ -6,7 +6,7 @@ next_generation = []
 threshold = 0.1
 
 #SQL stuff
-db_file = r'../mecs.db'
+db_file = r'../../mecs.db'
 connection = DBConnection(db_file)
 
 def event_query(event):
@@ -43,7 +43,7 @@ def predict(event):
             next_generation.append(parsed_event)
 
 #read events from dump, continue on user input
-ringdump = open('../ringdump.json', 'r')
+ringdump = open('../../ringdump.json', 'r')
 
 line = ringdump.readline()
 while line:

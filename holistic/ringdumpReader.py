@@ -8,7 +8,7 @@ totalEvents = 0
 print()
 print()
 
-with open('../ringdump.json', 'r') as ringdump:
+with open('../../ringdump.json', 'r') as ringdump:
     line = ringdump.readline()
 
     while line and totalEvents <= 50000:
