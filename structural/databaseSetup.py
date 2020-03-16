@@ -14,7 +14,6 @@ def setup():
     create_properties = """CREATE TABLE IF NOT EXISTS properties (
         type text NOT NULL,
         value text NOT NULL,
-        relation_count integer NOT NULL,
         PRIMARY KEY (type, value));"""
     create_property_relations = """CREATE TABLE IF NOT EXISTS property_relations (
         cause integer,

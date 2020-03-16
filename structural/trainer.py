@@ -11,7 +11,7 @@ def property_query(property):
     return connection.execute_query(sql_query)
 
 def property_insert(property):
-    sql_insert = f"""INSERT INTO properties (type, value, relation_count) VALUES ('{property['type']}', '{property['value']}', 0);"""
+    sql_insert = f"""INSERT INTO properties (type, value) VALUES ('{property['type']}', '{property['value']}');"""
     connection.execute_statement(sql_insert)
 
 def relation_query(property1, property2):
@@ -24,9 +24,6 @@ def relation_insert(property1, property2):
     sql_insert = f"""INSERT INTO property_relations (cause, effect, count, time_average) VALUES ({property1['id']}, {property2['id']}, 1, {time_dif})"""
     connection.execute_statement(sql_insert)
 
-    property_update = f"""UPDATE properties SET relation_count = 1 WHERE ROWID IN ({property1['id']}, {property2['id']});"""
-    connection.execute_statement(property_update)
-
 def relation_update(property1, property2, relation):
     count = relation[2]
     time_average = relation[3]
@@ -37,12 +34,6 @@ def relation_update(property1, property2, relation):
 
     relation_update = f"""UPDATE property_relations SET count = {count}, time_average = {time_average} WHERE cause = {property1['id']} AND effect = {property2['id']};"""
     connection.execute_statement(relation_update)
-
-    property_update = f"""UPDATE properties SET relation_count = {property1['relation_count'] + 1} WHERE ROWID = {property1['id']};"""
-    connection.execute_statement(property_update)
-
-    property_update = f"""UPDATE properties SET relation_count = {property2['relation_count'] + 1} WHERE ROWID = {property2['id']};"""
-    connection.execute_statement(property_update)
 
 ringdump = open('../../ringdump.json', 'r')
 
@@ -73,13 +64,12 @@ for key in event:
         properties = property_query(property)
 
     property['id'] = properties[0][0]
-    property['relation_count'] = properties[0][3]
 
     last_properties.append(property)
 
 line = ringdump.readline()
 
-while line and (total_events <= 100):
+while line and (total_events <= 1000):
     event = json.loads(line)
 
     #if event is incomplete, ignore it
@@ -107,7 +97,6 @@ while line and (total_events <= 100):
             properties = property_query(property)
 
         property['id'] = properties[0][0]
-        property['relation_count'] = properties[0][3]
 
         for last_property in last_properties:
             if last_property['type'] == property['type']:
