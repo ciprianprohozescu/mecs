@@ -29,7 +29,10 @@ try:
         except KeyboardInterrupt:
             break
 
-        channel.basic_publish(exchange='events', routing_key='in.fake', body=line)
+        del event['time_dif']
+        event['time'] = time.time()
+        
+        channel.basic_publish(exchange='events', routing_key='in.fake', body=json.dumps(event))
         print(" [x] Sent event!")
         last_event = time.time()
 except KeyboardInterrupt:
