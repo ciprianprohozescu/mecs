@@ -6,9 +6,9 @@ import time
 #RabbitMQ setup
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
-channel.exchange_declare(exchange='events', exchange_type='direct')
-channel.queue_declare(queue='in.fake')
-channel.queue_bind(exchange='events', queue='in.fake')
+channel.exchange_declare(exchange = 'events-in', exchange_type = 'direct')
+channel.queue_declare(queue = 'in.fake', auto_delete = True)
+channel.queue_bind(exchange = 'events-in', queue = 'in.fake', routing_key = 'in.fake')
 
 #open the fake dump
 fakedump = open(os.path.expanduser('~/Telenor/fake_data.json'))
@@ -32,7 +32,7 @@ try:
         del event['time_dif']
         event['time'] = time.time()
         
-        channel.basic_publish(exchange='events', routing_key='in.fake', body=json.dumps(event))
+        channel.basic_publish(exchange = 'events-in', routing_key = 'in.fake', body = json.dumps(event))
         print(" [x] Sent event!")
         last_event = time.time()
 except KeyboardInterrupt:
