@@ -6,9 +6,9 @@ import time
 #RabbitMQ setup
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
-channel.exchange_declare(exchange='events', exchange_type='direct')
-channel.queue_declare(queue='in.ringdump')
-channel.queue_bind(exchange='events', queue='in.ringdump')
+channel.exchange_declare(exchange = 'events-in', exchange_type = 'direct')
+channel.queue_declare(queue = 'in.ringdump', auto_delete = True)
+channel.queue_bind(exchange = 'events-in', queue = 'in.ringdump', routing_key = 'in.ringdump')
 
 #open ringdump
 ringdump = open(os.path.expanduser('~/Telenor/ringdump.json'))
@@ -22,7 +22,7 @@ while not 'time' in event:
     event = json.loads(line)
 
 last_event_theoretical = float(event['time'])
-channel.basic_publish(exchange='events', routing_key='in.ringdump', body=line)
+channel.basic_publish(exchange='events-in', routing_key='in.ringdump', body=line)
 print(" [x] Sent event!")
 last_event_actual = float(time.time())
 
@@ -42,7 +42,7 @@ try:
             break
 
         last_event_theoretical = float(event['time'])
-        channel.basic_publish(exchange='events', routing_key='in.ringdump', body=line)
+        channel.basic_publish(exchange = 'events-in', routing_key = 'in.ringdump', body = line)
         print(" [x] Sent event!")
         last_event_actual = time.time()
 except KeyboardInterrupt:

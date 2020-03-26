@@ -3,32 +3,36 @@ import json
 import pandas as pd
 import numpy as np
 import sys
-if sys.version_info[0] < 3:
-    from BytesIO import BytesIO
-else:
-    from io import BytesIO
+import time
+import datetime
+from io import BytesIO
     
 class Translator():
+    channel = None
 
     """ Open Connection """
     def __init__(self):
         # Connect to RabbitMQ server
         connection = pika.BlockingConnection(
         pika.ConnectionParameters(host='localhost'))
-        channel = connection.channel()
-        channel.queue_declare(queue = 'in.ringdump', auto_delete = True)
-        channel.queue_declare(queue = 'in.kibana') # auto_delete = True
-        channel.queue_declare(queue = 'in.fake') # auto_delete = True
+        self.channel = connection.channel()
+        self.channel.queue_declare(queue = 'in.ringdump', auto_delete = True)
+        self.channel.queue_declare(queue = 'in.kibana', auto_delete = True)
+        self.channel.queue_declare(queue = 'in.fake', auto_delete = True)
+
+        self.channel.exchange_declare(exchange = 'events-out', exchange_type = 'direct')
+        self.channel.queue_declare(queue = 'out', durable = True, auto_delete = True)
+        self.channel.queue_bind(exchange = 'events-out', queue = 'out', routing_key = 'out')    
+
+        self.channel.basic_qos(prefetch_count = 1)
 
         print('[x] Waiting for messages, to cancel press Ctrl + C')
 
-        channel.basic_qos(prefetch_count = 1)
-
-        """ Callback setup """
-        channel.basic_consume(queue = 'in.ringdump', on_message_callback = self.callback_ringdump)
-        channel.basic_consume(queue = 'in.kibana', on_message_callback = self.callback_kibana)
-        channel.basic_consume(queue = 'in.fake', on_message_callback = self.callback_fake)
-        channel.start_consuming()
+        # Callback setup
+        self.channel.basic_consume(queue = 'in.ringdump', on_message_callback = self.callback_ringdump)
+        self.channel.basic_consume(queue = 'in.kibana', on_message_callback = self.callback_kibana)
+        self.channel.basic_consume(queue = 'in.fake', on_message_callback = self.callback_fake)
+        self.channel.start_consuming()
 
     """ Receives the message and calls for modification """
     def callback_ringdump(self, ch, method, properties, body):
@@ -47,6 +51,8 @@ class Translator():
     # rindgump's attributes are in the same order as in the template
     # deletion of keys should be enough to match UnifiedDataModel
     def modify_ringdump(self, message):
+        print("[x] Received ringdump event")
+
         event = json.loads(message)
         event_template = set(['time',
                               'node',
@@ -58,15 +64,17 @@ class Translator():
             if not attribute in event_template:
                 del event[attribute]
 
-        json_message = json.dump(event)
+        json_message = json.dumps(event)
         self.send(json_message)
 
     """ Kibana dump modification - renaming, adding labels and dropping unnecessary attributes """
     def modify_kibana(self, message):
+        print("[x] Received kibana event")
+
         # columns names - for labeling, list of labels that has been renamed:
-        # @host -> node, message -> event, @timestamp -> time
-        col_names = ['node', '@log_message', 'time', '_id', '_index', '_score',
-                    '_type', 'event_timestamp', 'host', 'logsource', 'event',
+        # @host -> node, @log_message -> event, @timestamp -> time
+        col_names = ['node', 'event', 'time', '_id', '_index', '_score',
+                    '_type', 'event_timestamp', 'host', 'logsource', 'message',
                     'syslog_facility', 'syslog_facility_code', 'syslog_hostname', 'syslog_pri',
                     'syslog_severity', 'syslog_severity_code', 'syslog_timestamp', 'tags', 'type']
 
@@ -75,6 +83,8 @@ class Translator():
         df = pd.read_csv(kibana_line, sep = ',', names = col_names)
         # take only the necessary labels and re-arrange them
         df = df.loc[:, ['time', 'node', 'event']]
+        #convert time column from date string to unix timestamp
+        df['time'] = time.mktime(datetime.datetime.strptime(str(df.iloc[0]['time']), '%b %d, %Y @ %H:%M:%S.%f').timetuple())
         # create 'level' column and insert nan value
         df['level'] = np.nan
 
@@ -84,6 +94,8 @@ class Translator():
         
     """ Fake dump modification - adding, converting the attributes """
     def modify_fake(self, message):
+        print("[x] Received fake event")
+    
         event = json.loads(message)
         event['node'] = event['data_center'] + '-' + event['subsection']
         event_template = set(['time', 'node', 'event', 'level'])
@@ -93,7 +105,7 @@ class Translator():
                 del event[attribute]
 
          # Convert the numerical values to categorical values
-        level_template = {1: 'Normal', 2: 'Minor', 3: 'Minor', 4: 'Major' , 5: 'Major' , 6: 'Fatal'}
+        level_template = {1: 'Normal', 2: 'Warning', 3: 'Minor', 4: 'Major' , 5: 'Critical' , 6: 'Fatal'}
 
         event['level'] = level_template[event['level']]
 
@@ -102,20 +114,15 @@ class Translator():
 
     """  Adds modified json to the queue 'out' """
     def send(self, message):
-        connection = pika.BlockingConnection(
-                pika.ConnectionParameters(host = 'localhost'))
-        channel = connection.channel()
-
-        channel.queue_declare(queue = 'out', durable = True, auto_delete = True)
-        print("Sending the events, preess Ctrl + C to cancel")
-
-        channel.basic_publish(exchange = '',
+        self.channel.basic_publish(exchange = 'events-out',
                               routing_key = 'out',
                               body = message,
                               properties = pika.BasicProperties(
                                   delivery_mode = 2, # make message persistent
                               ))
+        print()
         print(message)
-        print("[x] Sent Event")
+        print("[x] Sent event!")
+        print()
     
 translator = Translator()

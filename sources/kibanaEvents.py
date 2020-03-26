@@ -6,9 +6,9 @@ import time
 #RabbitMQ setup
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
-channel.exchange_declare(exchange='events', exchange_type='direct')
-channel.queue_declare(queue='in.kibana')
-channel.queue_bind(exchange='events', queue='in.kibana')
+channel.exchange_declare(exchange = 'events-in', exchange_type = 'direct')
+channel.queue_declare(queue = 'in.kibana', auto_delete = True)
+channel.queue_bind(exchange = 'events-in', queue = 'in.kibana', routing_key = 'in.kibana')
 
 #open kibana dump
 ringdump = open(os.path.expanduser('~/Telenor/errors_last_15_minutes.csv'))
@@ -33,13 +33,8 @@ try:
             break
 
         last_event = time.time()
-        channel.basic_publish(exchange='events', routing_key='in.kibana', body=line)
-        print(line)
-        print()
-        print()
+        channel.basic_publish(exchange = 'events-in', routing_key = 'in.kibana', body = line)
         print(" [x] Sent event!") 
-        print()
-        print()
 except KeyboardInterrupt:
     pass
 
