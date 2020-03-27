@@ -14,7 +14,7 @@ def setup():
         id integer PRIMARY KEY,
         time real,
         node text,
-        event integer
+        event integer,
         level text);"""
     
     connection.execute_statement(create_events)

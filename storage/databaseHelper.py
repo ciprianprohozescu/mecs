@@ -7,7 +7,6 @@ class DBConnection:
     def __init__(self, db_file):
         try:
             self.connection = sqlite3.connect(db_file)
-            print(sqlite3.version)
         except Error as e:
             print(e)
 
