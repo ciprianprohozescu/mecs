@@ -6,7 +6,14 @@ import json
 class Api_Listener():
     
     def __init__(self):
-        pass
+        """ Using Rabbitmq, open a connection and create a queue """
+        self.connection = pika.BlockingConnection(
+                        pika.ConnectionParameters(host = 'localhost'))
+        self.channel = connection.channel()
+
+        self.channel.exchange_declare(exchange='events-in', exchange_type='direct')
+        self.channel.queue_declare(queue = 'in.fake', auto_delete = True)
+        self.channel.queue_bind(exchange='events-in', queue='in.fake', routing_key='in.fake')
     
     def receive_data(self):
         """ Sends GET request to the API """
@@ -21,18 +28,10 @@ class Api_Listener():
             self.send(json.dumps(element))
 
     def send(self, message): 
-        """ Using Rabbitmq, open a connection, create a queue and send the data """
-        connection = pika.BlockingConnection(
-                        pika.ConnectionParameters(host = 'localhost'))
-        channel = connection.channel()
-
-        channel.exchange_declare(exchange='events-in', exchange_type='direct')
-        channel.queue_declare(queue = 'in.fake', auto_delete = True)
-        channel.queue_bind(exchange='events-in', queue='in.fake', routing_key='in.fake')
-
+        """ Publish the message to the queue """
         print("Sending the events, preess Ctrl + C to cancel")
         
-        channel.basic_publish(exchange = 'events-in',
+        self.channel.basic_publish(exchange = 'events-in',
                               routing_key = 'in.fake',
                               body = message,
         properties = pika.BasicProperties(
