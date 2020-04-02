@@ -14,14 +14,14 @@ def event_insert(event):
 def storeEvent(channel, method, properties, body):
     event = json.loads(body)
     event_insert(event)
+    channel.basic_ack(delivery_tag = method.delivery_tag)
     print('[x] Event stored!')
-    return
 
 #RabbitMQ setup
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
-channel.queue_declare(queue = 'out', durable = True, auto_delete = True)
-channel.basic_consume(queue='out', on_message_callback=storeEvent, auto_ack=True)
+channel.queue_declare(queue = 'out.storage', durable = True, auto_delete = True)
+channel.basic_consume(queue = 'out.storage', on_message_callback = storeEvent)
 
 print(' Waiting for events... press CTRL+C to terminate')
 channel.start_consuming()
