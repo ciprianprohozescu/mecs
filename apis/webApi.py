@@ -1,5 +1,6 @@
 import flask
 from flask import request, jsonify
+from flask_cors import CORS, cross_origin
 import pika
 import json
 import threading
@@ -9,9 +10,10 @@ max_size = 50
 
 app = flask.Flask(__name__)
 app.config["DEBUG"] = True
+app.config['CORS_HEADERS'] = 'Content-Type'
 
-
-@app.route('/', methods=['GET'])
+@app.route('/', methods = ['GET'])
+@cross_origin()
 def home():
     return jsonify(events)
 

@@ -1,20 +1,30 @@
 <template>
   <div>
+    {{ events }}
   </div>
 </template>
 
-<scrip src="../eventsListener.js">
 <script>
+import axios from 'axios'
+
 export default {
   name: 'EventsList',
 
   props: {
-    msg: String,
-    amqp: {}
+  },
+
+  data() {
+    return {
+      events: null
+    }
   },
 
   mounted() {
-    
+    setInterval(() => {
+      axios.get('http://localhost:5000/').then(response => {
+        this.events = response.data;
+      });
+    }, 2000);
   }
 }
 </script>
