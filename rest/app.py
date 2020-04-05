@@ -1,10 +1,9 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from data_dump import data_dump
 from flask import jsonify
-app = Flask(__name__)
+from apiEvents import Api_Listener
 
-# calls a method that reads local events and returns them
-dump_data = data_dump()
+app = Flask(__name__)
 
 #Routing
 """ Main Page """
@@ -18,16 +17,43 @@ def index():
 def about():
     return render_template('about.html')
 
-""" Returns all jsonified events """
+""" Returns all jsonified events in dump_data """
 @app.route('/all', methods=['GET'])
 def api_all():
     return jsonify(dump_data)
 
-""" Returns jsonified event at the n-th position """
+""" Returns jsonified event of the dump_data at the n-th position """
 @app.route('/<string:id>/', methods=['GET'])
 def api_event_id(id):
     num_id = int(id)
     return jsonify(dump_data[num_id-1])
 
+""" Return most recent events """
+@app.route('/recent', methods=['GET'])
+def api_recent_events():
+    return jsonify(most_recent)
+
+""" Add a new event, remove most recent events and add new ones """
+@app.route('/addEvent', methods=['POST'])
+def api_add_event():
+    data = request.data
+    data_json = data.decode('utf-8')
+    # update most recent events
+    most_recent.append(data_json)
+
+""" A dumping script should include this, so it clears up the 
+    data that had been sent before it before it sends its own data """
+@app.route('/clear', methods=['POST'])
+def api_cleanup():
+    most_recent.clear()
+    
 if __name__ == '__main__':
+    # calls a method that reads local events and returns them
+    dump_data = data_dump()
+    # create an instance of an api listener
+    api_listener = Api_Listener()
+    # at the beginning dump data is the most recent
+    most_recent = list(dump_data)
+    # run the app
     app.run(debug = True, use_reloader = False) # if use_reloader=True, debug=True causes SystemExit error
+    
