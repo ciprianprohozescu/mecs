@@ -20,9 +20,11 @@ class Translator():
         self.channel.queue_declare(queue = 'in.kibana', auto_delete = True)
         self.channel.queue_declare(queue = 'in.fake', auto_delete = True)
 
-        self.channel.exchange_declare(exchange = 'events-out', exchange_type = 'direct')
-        self.channel.queue_declare(queue = 'out', durable = True, auto_delete = True)
-        self.channel.queue_bind(exchange = 'events-out', queue = 'out', routing_key = 'out')    
+        self.channel.exchange_declare(exchange = 'events-out', exchange_type = 'fanout')
+        self.channel.queue_declare(queue = 'out.storage', durable = True, auto_delete = True)
+        self.channel.queue_declare(queue = 'out.web', durable = True, auto_delete = True)
+        self.channel.queue_bind(exchange = 'events-out', queue = 'out.storage')    
+        self.channel.queue_bind(exchange = 'events-out', queue = 'out.web')  
 
         self.channel.basic_qos(prefetch_count = 1)
 
@@ -118,7 +120,7 @@ class Translator():
     """  Adds modified json to the queue 'out' """
     def send(self, message):
         self.channel.basic_publish(exchange = 'events-out',
-                              routing_key = 'out',
+                              routing_key = '',
                               body = message,
                               properties = pika.BasicProperties(
                                   delivery_mode = 2, # make message persistent
