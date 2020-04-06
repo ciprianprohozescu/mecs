@@ -4,6 +4,7 @@ import pika
 import json
 from datetime import datetime
 import time
+from requests.exceptions import ConnectionError
 
 class Api_Listener():
     
@@ -23,9 +24,13 @@ class Api_Listener():
     def receive_data(self):
         """ Sends GET request to the API """
         # sending get request and saving the response as response object 
-        response = requests.get("http://localhost:5000/recent")
-        # print(response.status_code)
-        return response.json()
+        try:
+            response = requests.get("http://localhost:5000/recent")
+            return response.json()
+        except ConnectionError as e:
+            print(""" Coulnd't connect to the API, server down? """)
+            print(e)
+            return []
         
     def listen_for_data(self, data):
         """ Receives any new data from the API """
@@ -37,8 +42,8 @@ class Api_Listener():
             self.send(json.dumps(element))
     
     def receive_send_data(self):
-        """ Combination of receive_data, send_data, running in a loop,
-            listens for data every 5 seconds and then sends it """
+        """ Combination of receive_data, send_data - running in a loop,
+            listens for data every 10 seconds and then sends it """
         while True:
             data = self.receive_data()
             if data:

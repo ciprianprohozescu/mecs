@@ -1,21 +1,36 @@
 import requests
 import json
 from data_dump import data_dump
+from requests.exceptions import ConnectionError
 
 URL = "http://localhost:5000/addEvent"
-URL_CLEANUP = "http://localhost:5000/clear"
 
 def load_data():
-    loaded_data = data_dump()
-    return loaded_data
+    try:
+        loaded_data = data_dump()
+        # return empty list and true value if the loaded_data is empty
+        if not loaded_data:
+            print('No data has been loaded')
+            return [], True
+        # otherwise return the list and false value
+        else:
+            return loaded_data, False
+    except FileNotFoundError:
+        print(""" Couldn't locate the file, no data loaded """)
 
 def send_data(data):
-    # cleanup the API's most recent data
-    requests.post(URL_CLEANUP)
     for element in data:
-        requests.post(URL, data = json.dumps(element))
-        print('[x] Sent Event: ', element)
+        try:
+            requests.post(URL, data = json.dumps(element))
+            print('[x] Sent Event: ', element)
+        except ConnectionError as e:
+            print(""" Couldn't connect to the API, server down? """)
+            print(e)
         
-# data = load_data()
-data = load_data()
-send_data(data)
+data, isEmpty = load_data()
+# makes sure list is not empty
+if not isEmpty:
+    print('Establishing connection with the API')
+    send_data(data)
+else:
+    print(""" Couldn't send an empty list """)

@@ -31,7 +31,11 @@ def api_event_id(id):
 """ Return most recent events """
 @app.route('/recent', methods=['GET'])
 def api_recent_events():
-    return jsonify(most_recent)
+    to_send = list(most_recent)
+    # clear most recent
+    most_recent.clear()
+    # send the most recent
+    return jsonify(to_send)
 
 """ Add a new event, remove most recent events and add new ones """
 @app.route('/addEvent', methods=['POST'])
@@ -40,20 +44,13 @@ def api_add_event():
     data_json = data.decode('utf-8')
     # update most recent events
     most_recent.append(data_json)
-
-""" A dumping script should include this, so it clears up the 
-    data that had been sent before it before it sends its own data """
-@app.route('/clear', methods=['POST'])
-def api_cleanup():
-    most_recent.clear()
     
 if __name__ == '__main__':
     # calls a method that reads local events and returns them
+    # used solely for display purpposes
     dump_data = data_dump()
-    # create an instance of an api listener
-    api_listener = Api_Listener()
-    # at the beginning dump data is the most recent
-    most_recent = list(dump_data)
+    # most recent data
+    most_recent = []
     # run the app
     app.run(debug = True, use_reloader = False) # if use_reloader=True, debug=True causes SystemExit error
     
