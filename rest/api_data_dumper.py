@@ -2,6 +2,7 @@ import requests
 import json
 from data_dump import data_dump
 from requests.exceptions import ConnectionError
+import time
 
 URL = "http://localhost:5000/addEvent"
 
@@ -23,6 +24,8 @@ def send_data(data):
         try:
             requests.post(URL, data = json.dumps(element))
             print('[x] Sent Event: ', element)
+            # delay by time_dif attribute in miliseconds
+            time.sleep(element['time_dif']/1000)
         except ConnectionError as e:
             print(""" Couldn't connect to the API, server down? """)
             print(e)
