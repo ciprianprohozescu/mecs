@@ -22,10 +22,14 @@ def load_data():
 def send_data(data):
     for element in data:
         try:
-            requests.post(URL, data = json.dumps(element))
-            print('[x] Sent Event: ', element)
             # delay by time_dif attribute in miliseconds
             time.sleep(element['time_dif']/1000)
+
+            del element['time_dif']
+            element['time'] = time.time()
+            requests.post(URL, data = json.dumps(element))
+
+            print('[x] Sent Event: ', element)
         except ConnectionError as e:
             print(""" Couldn't connect to the API, server down? """)
             print(e)

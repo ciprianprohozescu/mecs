@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request
 from data_dump import data_dump
 from flask import jsonify
-from apiEvents import Api_Listener
+import json
 
 app = Flask(__name__)
 
@@ -34,16 +34,17 @@ def api_recent_events():
     to_send = list(most_recent)
     # clear most recent
     most_recent.clear()
+    print(to_send)
     # send the most recent
     return jsonify(to_send)
 
 """ Add a new event, remove most recent events and add new ones """
 @app.route('/addEvent', methods=['POST'])
 def api_add_event():
-    data = request.data
-    data_json = data.decode('utf-8')
+    data_json = json.loads(request.data)
     # update most recent events
     most_recent.append(data_json)
+    return 'OK'
     
 if __name__ == '__main__':
     # calls a method that reads local events and returns them

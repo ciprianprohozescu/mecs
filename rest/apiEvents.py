@@ -32,10 +32,6 @@ class Api_Listener():
             print(e)
             return []
         
-    def listen_for_data(self, data):
-        """ Receives any new data from the API """
-        self.send(json.dumps(data))
-        
     def send_data(self, data):
         """ Pass each serialized dictionary """
         for element in data:
