@@ -46,7 +46,7 @@ export default {
           this.events[i].time = this.formatTime(this.events[i]);
         }
       });
-    }, 2000);
+    }, 500);
   },
 
   methods: {
