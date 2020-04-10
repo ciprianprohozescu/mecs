@@ -1,0 +1,37 @@
+# Docker Compose description of the combined application.
+#
+# 'docker-compose up' will run this.
+version: '3'  # requires Docker Compose 1.13 or later
+
+services:
+  
+  rabbitmq:
+    # This variant is built on Alpine Linux (it's smaller) and includes
+    # the management UI.
+    image: 'rabbitmq:3-management-alpine'
+    ports:
+      # The standard AMQP protocol port
+      - '5672:5672'
+      # HTTP management UI
+      - '15672:15672'
+
+    networks:
+      - rabbitmqnetwork
+
+  gateway:
+    image: ucncsteam17/gateway:0.0.2
+    environment:
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+    networks:
+      - rabbitmqnetwork
+
+  # publishes fake data to a queue
+  fakedata:
+    image: ucncsteam17/fakedata:0.0.2
+    environment:
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+    networks:
+      - rabbitmqnetwork
+
+networks:
+  rabbitmqnetwork: {}
