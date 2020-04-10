@@ -1,6 +1,7 @@
 import pika
-import os
 import json
+import pandas as pd
+import numpy as np
 import sys
 import time
 import datetime
@@ -12,10 +13,8 @@ class Translator():
     """ Open Connection """
     def __init__(self):
         # Connect to RabbitMQ server
-        amqp_url = os.environ['AMQP_URL']
-        print('URL: %s' % (amqp_url,))
-        parameters = pika.URLParameters(amqp_url)
-        connection = pika.BlockingConnection(parameters)
+        connection = pika.BlockingConnection(
+        pika.ConnectionParameters(host='localhost'))
         self.channel = connection.channel()
         self.channel.queue_declare(queue = 'in.ringdump', auto_delete = True)
         self.channel.queue_declare(queue = 'in.kibana', auto_delete = True)
@@ -130,6 +129,5 @@ class Translator():
         print(message)
         print("[x] Sent event!")
         print()
-
-if __name__ == "__main__":
-    translator = Translator()
+    
+translator = Translator()
