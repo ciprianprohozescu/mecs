@@ -1,23 +1,32 @@
 import os
 from databaseHelper import DBConnection
 
-db_file = os.path.expanduser('~/Telenor/mecs.db')
-connection = DBConnection(db_file)
+class DatabaseSetup:
+    def __init__(self, db_loc):
+        self.connection = DBConnection(db_loc)
 
-def purge():
-    drop_events = 'DROP TABLE IF EXISTS events;'
 
-    connection.execute_statement(drop_events)
+    def purge(self):
+        drop_events = 'DROP TABLE IF EXISTS events;'
 
-def setup():
-    create_events = """CREATE TABLE IF NOT EXISTS events (
-        id integer PRIMARY KEY,
-        time real,
-        node text,
-        event integer,
-        level text);"""
-    
-    connection.execute_statement(create_events)
+        self.connection.execute_statement(drop_events)
 
-purge()
-setup()
+
+    def setup(self):
+        create_events = """CREATE TABLE IF NOT EXISTS events (
+            id integer PRIMARY KEY,
+            time real,
+            node text,
+            event integer,
+            level text);"""
+        
+        self.connection.execute_statement(create_events)
+
+
+if __name__ == "__main__":
+    db_loc = os.environ['SQLITE_DB_LOC']
+    dbsetup = DatabaseSetup(db_loc)
+    print('purging previous database')
+    purge()
+    print('creating new database')
+    setup()
