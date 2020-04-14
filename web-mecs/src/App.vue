@@ -3,17 +3,19 @@
     <div class="container">
       <div class="columns">
         <div class="column">
-          <div class="box menu-text">
-            <p class="title">Menu</p>
-            <div class="field">
-              <button :class="['button', tab == 1 ? 'is-primary' : '']" @click="tab = 1">Live feed</button>
-            </div>
-            <div class="field">
-              <button :class="['button', tab == 2 ? 'is-primary' : '']" @click="tab = 2">Charts</button>
+          <div>
+            <div class="box menu-text">
+              <p class="title">Menu</p>
+              <div class="field">
+                <button :class="['button', tab == 1 ? 'is-primary' : '']" @click="tab = 1">Live feed</button>
+              </div>
+              <div class="field">
+                <button :class="['button', tab == 2 ? 'is-primary' : '']" @click="tab = 2">Charts</button>
+              </div>
             </div>
           </div>
         </div>
-        <div class="column is-two-thirds">
+        <div class="column is-three-quarters">
           <EventsList v-if="tab == 1"/>
         </div>
       </div>
@@ -51,5 +53,6 @@ export default {
 }
 .menu-text {
   text-align: center;
+  position: fixed;
 }
 </style>
