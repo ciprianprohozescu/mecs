@@ -4,6 +4,8 @@ import json
 import sys
 import time
 import datetime
+import pandas as pd
+import numpy as np
 from io import BytesIO
     
 class Translator():
