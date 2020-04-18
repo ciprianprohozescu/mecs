@@ -23,7 +23,7 @@ class Fake_Event_Data_Gen:
         fakedump = open(self.file_loc, 'r')
         line = fakedump.readline()
         print(" Sending events... press CTRL+C to terminate")
-        # just in case, don't want any unexpected invalid data errors
+        # just in case, define an endpoint don't want any unexpected invalid data errors
         while line:
             event = json.loads(line)
             

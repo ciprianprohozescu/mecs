@@ -30,7 +30,7 @@ services:
       - rabbitmqnetwork
 
   gateway:
-    image: ucncsteam17/gateway:0.0.2
+    image: ucncsteam17/gateway:0.0.3
     environment:
       AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
     networks:
@@ -39,6 +39,14 @@ services:
   # publishes fake data to a queue
   fakedata:
     image: ucncsteam17/fakedata:0.0.2
+    environment:
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+    networks:
+      - rabbitmqnetwork
+
+  # publishes simulated kibana events to a queue
+  kibanaevents:
+    image: ucncsteam17/kibanaevents:0.0.1
     environment:
       AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
     networks:
