@@ -52,6 +52,14 @@ services:
     networks:
       - rabbitmqnetwork
 
+  ringdumpevents:
+    image: ringdumpevents
+    environment:
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+    networks:
+      - rabbitmqnetwork
+
+
 networks:
   rabbitmqnetwork: {}
 
