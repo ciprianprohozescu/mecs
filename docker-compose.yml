@@ -53,7 +53,7 @@ services:
       - rabbitmqnetwork
 
   ringdumpevents:
-    image: ringdumpevents
+    image: ucncsteam17/ringdumpevents:0.0.1
     environment:
       AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
     networks:
