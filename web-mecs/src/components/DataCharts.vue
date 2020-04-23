@@ -43,6 +43,7 @@
 
 <script>
 import { GChart } from 'vue-google-charts';
+import axios from 'axios';
 
 export default {
   name: 'DataCharts',
@@ -137,18 +138,57 @@ export default {
   },
 
   mounted() {
-    this.columnChartData = this.prepareColumnChartData(this.data)
-    this.pieChartData = this.preparePieChartData(this.data)
-    this.gaugeChartData = this.prepareGaugeChartData(this.data)
+    setInterval(() => {
+      axios.get('http://localhost:5000/').then(response => {
+        var newData = response.data;
+        newData = this.jsonToArray(newData)
+        this.data = this.updateData(newData);
+        this.columnChartData = this.prepareColumnChartData(this.data);
+        this.pieChartData = this.preparePieChartData(this.data);
+        this.gaugeChartData = this.prepareGaugeChartData(this.data);
+      });
+    }, 2000);
   },
 
   methods: {
+    jsonToArray: function(data) {
+      let json_data = JSON.parse(JSON.stringify(data))
+      let array = []
+      for(let i=0; i < json_data.length; i++) {
+        let row = [];
+        row.push(json_data[i]['time']);
+        row.push(json_data[i]['node']);
+        row.push(json_data[i]['event']);
+        row.push(json_data[i]['level']);
+        array.push(row);
+      }
+      return array;
+    },
+
+    updateData: function(newData) {
+      // clone main data array
+      var updated_data = JSON.parse(JSON.stringify(this.data))
+      // keep last (50-newData.length) events, can be changed
+      if(updated_data.length + newData.length > 50) {
+        for(let i=0; i < newData.length; i++) {
+          updated_data.pop();
+          updated_data.push(newData[i]);
+        }
+      }
+      else {
+        for(let i=0; i < newData.length; i++) {
+          this.updated_data.push(newData[i]);
+        }
+      }
+      return updated_data;
+    },
+
     severityTranslation: function(data) {
       // clone the array
       var prep_data = JSON.parse(JSON.stringify(data))
       var dict = {"Normal": 1, "Minor": 2, "Warning": 3, "Major": 4, "Critical": 5, "Fatal": 6}
       // convert
-      for(var i=1; i < prep_data.length; i++) {
+      for(let i=1; i < prep_data.length; i++) {
         prep_data[i][3] = dict[prep_data[i][3]];
       }
       return prep_data;
@@ -156,7 +196,7 @@ export default {
 
     prepareColumnChartData: function(data) {
       var prep_data = this.severityTranslation(data);
-      for(var i=0; i < prep_data.length; i++){
+      for(let i=0; i < prep_data.length; i++){
         prep_data[i].splice(0, 1);
         prep_data[i].splice(1, 1);
       }
@@ -175,13 +215,13 @@ export default {
       var prep_data = this.severityTranslation(data);
       // drop header row
       prep_data.splice(0, 1);
-      for(var i=0; i < prep_data.length; i++) {
+      for(let i=0; i < prep_data.length; i++) {
         var value = prep_data[i][3];
         prepared[value-1][1]++;
       }
       // add labels to the 'prepared'
       var labels = [['Severity', 'Number of occurances']]
-      for(var j=0; j < prepared.length; j++) {
+      for(let j=0; j < prepared.length; j++) {
         var row = prepared[j];
         labels.push(row);
       }
@@ -192,13 +232,13 @@ export default {
       var prep_data = this.severityTranslation(data);
       var levels = [];
       // skip the header
-      for(var i=1; i < prep_data.length; i++) {
+      for(let i=1; i < prep_data.length; i++) {
         levels.push(prep_data[i][3]);
       }
       var min = Math.min(...levels);
       var max = Math.max(...levels);
       var levels_scaled = [];
-      for(var j=0; j < levels.length; j++) {
+      for(let j=0; j < levels.length; j++) {
         // min-max normalization [0, 1]
         var scaled = (levels[j] - min) / (max - min)
         console.log(scaled)
