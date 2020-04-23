@@ -33,12 +33,13 @@ export default {
 
   data() {
     return {
-      events: []
+      events: [],
+      timedRequests: {},
     }
   },
 
   mounted() {
-    setInterval(() => {
+    this.timedRequests = setInterval(() => {
       axios.get('http://localhost:5000/').then(response => {
         this.events = response.data.reverse();
 
@@ -47,6 +48,10 @@ export default {
         }
       });
     }, 500);
+  },
+
+  beforeDestroy() {
+    clearInterval(this.timedRequests);
   },
 
   methods: {

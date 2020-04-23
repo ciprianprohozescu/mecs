@@ -12,7 +12,8 @@
     "axios": "^0.19.2",
     "bulma": "^0.8.1",
     "core-js": "^3.6.4",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "vue-google-charts": "^0.3.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.2.0",

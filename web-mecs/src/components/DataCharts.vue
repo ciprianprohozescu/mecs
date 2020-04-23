@@ -45,10 +45,12 @@
 import { GChart } from 'vue-google-charts';
 
 export default {
-  name: 'app',
+  name: 'DataCharts',
+  
   components: {
     GChart
   },
+
   data() {
     return {
       // the data received from the gateway or whatever
@@ -133,11 +135,13 @@ export default {
       }
     }
   },
+
   mounted() {
     this.columnChartData = this.prepareColumnChartData(this.data)
     this.pieChartData = this.preparePieChartData(this.data)
     this.gaugeChartData = this.prepareGaugeChartData(this.data)
   },
+
   methods: {
     severityTranslation: function(data) {
       // clone the array
