@@ -17,7 +17,7 @@
         </div>
         <div class="column is-three-quarters">
           <EventsList v-if="tab == 1"/>
-          <DataCharts v-if="tab == 2"/>
+          <Charts v-if="tab == 2"/>
         </div>
       </div>
     </div>
@@ -26,7 +26,7 @@
 
 <script>
 import EventsList from './components/EventsList.vue'
-import DataCharts from './components/DataCharts.vue'
+import Charts from './components/Charts.vue'
 
 require('./bulma.min.css')
 
@@ -35,7 +35,7 @@ export default {
 
   components: {
     EventsList,
-    DataCharts
+    Charts
   },
 
   data() {
