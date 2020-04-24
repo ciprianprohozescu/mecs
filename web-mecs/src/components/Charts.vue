@@ -166,7 +166,9 @@ export default {
         var levels = [];
         
         for(let i = 0; i < data.length; i++) {
-            levels.push(this.severityTranslation(data[i]["level"]));
+            if (data[i]["level"]) {
+                levels.push(this.severityTranslation(data[i]["level"]));
+            }
         }
 
         var min = Math.min(...levels);
