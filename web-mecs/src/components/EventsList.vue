@@ -1,7 +1,25 @@
 <template>
-  <div>
-    {{ events }}
+<div>
+  <div class="box" v-for="(event, index) in events" :key="index">
+    <p class="time">{{ event.time }}</p>
+    <table class="table table-striped">
+      <tbody>
+        <tr>
+          <th>Event</th>
+          <td>{{ event.event }}</td>
+        </tr>
+        <tr>
+          <th>Node</th>
+          <td>{{ event.node }}</td>
+        </tr>
+        <tr>
+          <th>Level</th>
+          <td>{{ event.level }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
+</div>
 </template>
 
 <script>
@@ -15,16 +33,44 @@ export default {
 
   data() {
     return {
-      events: null
+      events: [],
+      timedRequests: {},
     }
   },
 
   mounted() {
-    setInterval(() => {
+    this.getData();
+    this.timedRequests = setInterval(this.getData, 2000);
+  },
+
+  beforeDestroy() {
+    clearInterval(this.timedRequests);
+  },
+
+  methods: {
+    getData() {
       axios.get('http://localhost:5000/').then(response => {
-        this.events = response.data;
+        this.events = response.data.reverse();
+
+        for (let i = 0; i < this.events.length; i++) {
+          this.events[i].time = this.formatTime(this.events[i]);
+        }
       });
-    }, 2000);
+    },
+    
+    formatTime(event) {
+      let date = new Date(event.time * 1000); //UNIX timestamp is in seconds, we need it in milliseconds
+
+      let months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      let year = date.getFullYear();
+      let month = months[date.getMonth()];
+      let day = date.getDate();
+      let hour = (date.getHours() < 10 ? '0' : '') + date.getHours();
+      let minute = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+      let second = (date.getSeconds() < 10 ? '0' : '') + date.getSeconds();
+
+      return day + ' ' + month + ' ' + year + ' ' + hour + ':' + minute + ':' + second;
+    }
   }
 }
 </script>
@@ -44,5 +90,8 @@ li {
 }
 a {
   color: #42b983;
+}
+.time {
+  text-align: right;
 }
 </style>
