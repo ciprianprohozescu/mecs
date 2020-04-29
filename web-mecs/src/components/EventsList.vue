@@ -33,12 +33,22 @@ export default {
 
   data() {
     return {
-      events: []
+      events: [],
+      timedRequests: {},
     }
   },
 
   mounted() {
-    setInterval(() => {
+    this.getData();
+    this.timedRequests = setInterval(this.getData, 2000);
+  },
+
+  beforeDestroy() {
+    clearInterval(this.timedRequests);
+  },
+
+  methods: {
+    getData() {
       axios.get('http://localhost:5000/').then(response => {
         this.events = response.data.reverse();
 
@@ -46,10 +56,8 @@ export default {
           this.events[i].time = this.formatTime(this.events[i]);
         }
       });
-    }, 500);
-  },
-
-  methods: {
+    },
+    
     formatTime(event) {
       let date = new Date(event.time * 1000); //UNIX timestamp is in seconds, we need it in milliseconds
 
