@@ -43,8 +43,8 @@ services:
     networks:
       - rabbitmqnetwork
 
-  postwebevents:
-    image: ucncsteam17/postwebevents:0.0.1
+  webconsumer:
+    image: ucncsteam17/webconsumer:0.0.1
     environment:
       AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
       API_ENDPOINT: 'http://webapi:5000/update'
