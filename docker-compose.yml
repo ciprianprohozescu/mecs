@@ -16,6 +16,20 @@ services:
     networks:
       - rabbitmqnetwork
 
+  webclient:
+    image: ucncsteam17/webclient:0.0.1
+    ports:
+      - '8080:8080'
+    networks:
+      - rabbitmqnetwork
+
+  webapi:
+    image: ucncsteam17/webapi:0.0.1
+    ports:
+      - '5000:5000'
+    networks:
+      - rabbitmqnetwork
+
   sqlite-database:
     image: ucncsteam17/sqlite-event-database:0.0.1
     #command: --init-file /storage/sqlite3-database/databaseSetup.py
@@ -29,10 +43,19 @@ services:
     networks:
       - rabbitmqnetwork
 
+  postwebevents:
+    image: ucncsteam17/postwebevents:0.0.1
+    environment:
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      API_ENDPOINT: 'http://webapi:5000/update'
+    networks:
+      - rabbitmqnetwork
+
   gateway:
     image: ucncsteam17/gateway:0.0.3
     environment:
       AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      PYTHON_BUFFERED: 0
     networks:
       - rabbitmqnetwork
 
@@ -41,6 +64,7 @@ services:
     image: ucncsteam17/fakedata:0.0.2
     environment:
       AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      PTYHON_BUFFERED: 0
     networks:
       - rabbitmqnetwork
 
@@ -49,6 +73,7 @@ services:
     image: ucncsteam17/kibanaevents:0.0.1
     environment:
       AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      PYTHON_BUFFERED: 0
     networks:
       - rabbitmqnetwork
 
@@ -56,9 +81,9 @@ services:
     image: ucncsteam17/ringdumpevents:0.0.1
     environment:
       AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      PYTHON_BUFFERED: 0
     networks:
       - rabbitmqnetwork
-
 
 networks:
   rabbitmqnetwork: {}

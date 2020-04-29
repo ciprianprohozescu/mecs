@@ -27,4 +27,5 @@ def update():
     print('[x] Event received!')
     return 'OK'
 
-app.run()
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
