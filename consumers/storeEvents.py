@@ -27,4 +27,7 @@ channel.basic_qos(prefetch_count = 1)
 channel.basic_consume(queue = 'out.storage', on_message_callback = storeEvent)
 
 print(' Waiting for events... press CTRL+C to terminate')
-channel.start_consuming()
+try:
+    channel.start_consuming()
+except KeyboardInterrupt:
+    pass

@@ -35,7 +35,10 @@ class Translator():
         self.channel.basic_consume(queue = 'in.ringdump', on_message_callback = self.callback_ringdump)
         self.channel.basic_consume(queue = 'in.kibana', on_message_callback = self.callback_kibana)
         self.channel.basic_consume(queue = 'in.fake', on_message_callback = self.callback_fake)
-        self.channel.start_consuming()
+        try:
+            self.channel.start_consuming()
+        except KeyboardInterrupt:
+            pass
 
     """ Receives the message and calls for modification """
     def callback_ringdump(self, ch, method, properties, body):
