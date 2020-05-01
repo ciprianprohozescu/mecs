@@ -30,16 +30,13 @@ services:
     networks:
       - rabbitmqnetwork
 
-  sqlite-database:
-    image: ucncsteam17/sqlite-event-database:0.0.1
-    #command: --init-file /storage/sqlite3-database/databaseSetup.py
+  databaseconsumer:
+    image: ucncsteam17/sqlite-event-database:0.0.2
     environment:
       SQLITE_DB_LOC: '/storage/sqlite3-database/mecs.db'
-      SQLITE_DB_INIT: 'True'
       AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
     volumes:
-      #- ./consumers/databaseSetup.py:/storage/sqlite3-database/databaseSetup
-      - sqlite3-database:/storage/sqlite3-database
+      - ./sqlite3-database:/storage/sqlite3-database
     networks:
       - rabbitmqnetwork
 
@@ -87,6 +84,3 @@ services:
 
 networks:
   rabbitmqnetwork: {}
-
-volumes:
-  sqlite3-database:

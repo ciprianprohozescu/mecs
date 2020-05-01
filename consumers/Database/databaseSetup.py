@@ -25,8 +25,9 @@ class DatabaseSetup:
 
 if __name__ == "__main__":
     db_loc = os.environ['SQLITE_DB_LOC']
+    # set up a database if one doesn't exist
     dbsetup = DatabaseSetup(db_loc)
-    print('purging previous database')
-    purge()
+    print('removing old database')
+    dbsetup.purge()
     print('creating new database')
-    setup()
+    dbsetup.setup()

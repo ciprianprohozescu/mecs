@@ -35,10 +35,10 @@ class StoreEvents:
 
 if __name__ == "__main__":
     db_loc = os.environ['SQLITE_DB_LOC']
-    if os.environ['SQLITE_DB_INIT'] == 'True':
+
+    if not os.path.exists(db_loc):
         dbsetup = DatabaseSetup(db_loc)
-        print('purging database')
-        dbsetup.purge()
-        print('setting up database')
+        print('creating new database')
         dbsetup.setup()
+
     store_events = StoreEvents(db_loc)
