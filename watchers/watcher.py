@@ -69,8 +69,7 @@ last_check = time.time()
 print(" [x] Watching queues, press CTRL + C to cancel...")
 try:
     while True:
-        if time.time() - last_check > interval:
-            check_queues()
-            last_check = time.time()
+        check_queues()
+        time.sleep(interval)   
 except KeyboardInterrupt:
     pass
