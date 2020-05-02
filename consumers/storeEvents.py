@@ -21,7 +21,13 @@ def storeEvent(channel, method, properties, body):
 connection = pika.BlockingConnection(pika.ConnectionParameters('localhost'))
 channel = connection.channel()
 channel.queue_declare(queue = 'out.storage', durable = True, auto_delete = True)
+
+#don't dispatch a message to a consumer until it has acknowledged the previous one
+channel.basic_qos(prefetch_count = 1)
 channel.basic_consume(queue = 'out.storage', on_message_callback = storeEvent)
 
 print(' Waiting for events... press CTRL+C to terminate')
-channel.start_consuming()
+try:
+    channel.start_consuming()
+except KeyboardInterrupt:
+    pass
