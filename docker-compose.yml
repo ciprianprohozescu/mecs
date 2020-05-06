@@ -17,7 +17,9 @@ services:
       - rabbitmqnetwork
 
   webclient:
-    image: ucncsteam17/webclient:0.0.1
+    image: ucncsteam17/webclient:0.1.1
+    environment:
+      API_ENDPOINT: 'http://localhost:5000/'
     ports:
       - '8080:8080'
     networks:
@@ -34,25 +36,31 @@ services:
     image: ucncsteam17/sqlite-event-database:0.0.2
     environment:
       SQLITE_DB_LOC: '/storage/sqlite3-database/mecs.db'
-      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=10'
     volumes:
       - ./sqlite3-database:/storage/sqlite3-database
+    depends_on:
+      - "rabbitmq"
     networks:
       - rabbitmqnetwork
 
   webconsumer:
     image: ucncsteam17/webconsumer:0.0.1
     environment:
-      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=10'
       API_ENDPOINT: 'http://webapi:5000/update'
+    depends_on:
+      - "rabbitmq"
     networks:
       - rabbitmqnetwork
 
   gateway:
     image: ucncsteam17/gateway:0.0.3
     environment:
-      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=10'
       PYTHON_BUFFERED: 0
+    depends_on:
+      - "rabbitmq"
     networks:
       - rabbitmqnetwork
 
@@ -60,8 +68,10 @@ services:
   fakedata:
     image: ucncsteam17/fakedata:0.0.2
     environment:
-      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=10'
       PTYHON_BUFFERED: 0
+    depends_on:
+      - "rabbitmq"
     networks:
       - rabbitmqnetwork
 
@@ -69,16 +79,20 @@ services:
   kibanaevents:
     image: ucncsteam17/kibanaevents:0.0.1
     environment:
-      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=10'
       PYTHON_BUFFERED: 0
+    depends_on:
+      - "rabbitmq"
     networks:
       - rabbitmqnetwork
 
   ringdumpevents:
     image: ucncsteam17/ringdumpevents:0.0.1
     environment:
-      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=5'
+      AMQP_URL: 'amqp://rabbitmq?connection_attempts=5&retry_delay=10'
       PYTHON_BUFFERED: 0
+    depends_on:
+      - "rabbitmq"
     networks:
       - rabbitmqnetwork
 

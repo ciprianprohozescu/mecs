@@ -108,7 +108,7 @@ export default {
 
   methods: {
       getData() {
-        axios.get('http://localhost:5000/').then(response => {
+        axios.get(process.env.VUE_APP_EVENTS_ENDPOINT).then(response => {
             let data = response.data;
             if (data.length > 0) {
                 this.columnChartData = this.prepareColumnChartData(data);
