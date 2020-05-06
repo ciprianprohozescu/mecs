@@ -49,7 +49,7 @@ export default {
 
   methods: {
     getData() {
-      axios.get('http://localhost:5000/').then(response => {
+      axios.get(process.env.VUE_APP_EVENTS_ENDPOINT).then(response => {
         this.events = response.data.reverse();
 
         for (let i = 0; i < this.events.length; i++) {
