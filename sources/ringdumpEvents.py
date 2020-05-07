@@ -11,7 +11,7 @@ channel.queue_declare(queue = 'in.ringdump', auto_delete = True)
 channel.queue_bind(exchange = 'events-in', queue = 'in.ringdump', routing_key = 'in.ringdump')
 
 #open ringdump
-ringdump = open(os.path.expanduser('~/Telenor/ringdump.json'))
+ringdump = open('../ringdump.json')
 print(" Sending events... press CTRL+C to terminate")
 
 #read the first event to set the initial time

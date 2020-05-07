@@ -11,7 +11,7 @@ channel.queue_declare(queue = 'in.fake', auto_delete = True)
 channel.queue_bind(exchange = 'events-in', queue = 'in.fake', routing_key = 'in.fake')
 
 #open the fake dump
-fakedump = open(os.path.expanduser('~/Telenor/fake_data.json'))
+fakedump = open('../fake_data.json')
 print(" Sending events... press CTRL+C to terminate")
 
 #assign a timestamp to the first event

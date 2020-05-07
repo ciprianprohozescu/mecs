@@ -11,7 +11,7 @@ channel.queue_declare(queue = 'in.kibana', auto_delete = True)
 channel.queue_bind(exchange = 'events-in', queue = 'in.kibana', routing_key = 'in.kibana')
 
 #open kibana dump
-ringdump = open(os.path.expanduser('~/Telenor/errors_last_15_minutes.csv'))
+ringdump = open('../errors_last_15_minutes.csv')
 print(" Sending events... press CTRL+C to terminate")
 
 #set the interval at which events will be fired
