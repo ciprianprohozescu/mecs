@@ -19,20 +19,14 @@ interval = 1
 
 #skip the first line
 ringdump.readline()
-last_event = time.time()
 
 #simulate event dispatch using their timestamps
 try:
     while True:
         line = ringdump.readline()
         
-        try:
-            while time.time() - last_event < interval:
-                continue
-        except KeyboardInterrupt:
-            break
+        time.sleep(interval)
 
-        last_event = time.time()
         channel.basic_publish(exchange = 'events-in', routing_key = 'in.kibana', body = line)
         print(" [x] Sent event!") 
 except KeyboardInterrupt:

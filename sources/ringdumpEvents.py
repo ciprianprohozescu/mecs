@@ -24,7 +24,6 @@ while not 'time' in event:
 last_event_theoretical = float(event['time'])
 channel.basic_publish(exchange='events-in', routing_key='in.ringdump', body=line)
 print(" [x] Sent event!")
-last_event_actual = float(time.time())
 
 #simulate event dispatch using their timestamps
 try:
@@ -35,16 +34,11 @@ try:
             line = ringdump.readline()
             event = json.loads(line)
         
-        try:
-            while (float(event['time']) - last_event_theoretical) > 1000 * (time.time() - last_event_actual):
-                continue
-        except KeyboardInterrupt:
-            break
+        time.sleep((float(event['time']) - last_event_theoretical) / 1000)
 
         last_event_theoretical = float(event['time'])
         channel.basic_publish(exchange = 'events-in', routing_key = 'in.ringdump', body = line)
         print(" [x] Sent event!")
-        last_event_actual = time.time()
 except KeyboardInterrupt:
     pass
 

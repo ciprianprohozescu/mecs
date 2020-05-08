@@ -14,27 +14,19 @@ channel.queue_bind(exchange = 'events-in', queue = 'in.fake', routing_key = 'in.
 fakedump = open('../fake_data.json')
 print(" Sending events... press CTRL+C to terminate")
 
-#assign a timestamp to the first event
-last_event = time.time()
-
 #simulate event dispatch using their time_difs
 try:
     while True:
         line = fakedump.readline()
         event = json.loads(line)
-        
-        try:
-            while event['time_dif'] > 1000 * (time.time() - last_event):
-                continue
-        except KeyboardInterrupt:
-            break
+
+        time.sleep(event['time_dif'] / 1000)
 
         del event['time_dif']
         event['time'] = time.time()
         
         channel.basic_publish(exchange = 'events-in', routing_key = 'in.fake', body = json.dumps(event))
         print(" [x] Sent event!")
-        last_event = time.time()
 except KeyboardInterrupt:
     pass
 
