@@ -28,7 +28,7 @@ class Watcher:
         storage_count = storage_queue.method.message_count
         web_count = web_queue.method.message_count
 
-        if (ringdump_count > threshold) or (fake_count > threshold) or (kibana_count > threshold):
+        if any((ringdump_count > threshold), (fake_count > threshold), (kibana_count > threshold)):
             self.gateway_instances += 1
             print("\n[x] Starting a new gateway...\n")
             os.system("docker service scale project_gateway="+str(self.gateway_instances))
