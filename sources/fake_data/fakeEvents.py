@@ -4,9 +4,8 @@ import json
 import time
 
 class Fake_Event_Data_Gen:
-    def __init__(self, file_loc):
+    def __init__(self, amqp_url, file_loc):
         #RabbitMQ setup
-        amqp_url = os.environ['AMQP_URL']
         print('URL: %s' % (amqp_url,))
         parameters = pika.URLParameters(amqp_url)
         connection = pika.BlockingConnection(parameters)
@@ -36,5 +35,6 @@ class Fake_Event_Data_Gen:
             line = fakedump.readline()
 
 if __name__ == "__main__":
-    fake_event_data_gen = Fake_Event_Data_Gen('fake_data.json')
+    amqp_url = os.environ['AMQP_URL'] if 'AMQP_URL' in os.environ else 'http://localhost'
+    fake_event_data_gen = Fake_Event_Data_Gen(amqp_url, 'fake_data.json')
     fake_event_data_gen.message_loop()

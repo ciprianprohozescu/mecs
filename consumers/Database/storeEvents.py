@@ -5,12 +5,11 @@ from databaseSetup import DatabaseSetup
 from databaseHelper import DBConnection
 
 class StoreEvents:
-    def __init__(self, db_loc):
+    def __init__(self, amqp_url, db_loc):
         self.db_connection = DBConnection(db_loc)
         print(' Connected to database!')
 
         #RabbitMQ setup
-        amqp_url = os.environ['AMQP_URL']
         parameters = pika.URLParameters(amqp_url)
         connection = pika.BlockingConnection(parameters)
 
@@ -34,11 +33,13 @@ class StoreEvents:
 
 
 if __name__ == "__main__":
-    db_loc = os.environ['SQLITE_DB_LOC']
+    amqp_url = os.environ['AMQP_URL'] if 'AMQP_URL' in os.environ else 'http://localhost'
+    # default sqlite db to working dir
+    db_loc = os.environ['SQLITE_DB_LOC'] if 'SQLITE_DB_LOC' in os.environ else './sqlite_db'
 
     if not os.path.exists(db_loc):
         dbsetup = DatabaseSetup(db_loc)
         print('creating new database')
         dbsetup.setup()
 
-    store_events = StoreEvents(db_loc)
+    store_events = StoreEvents(amqp_url, db_loc)

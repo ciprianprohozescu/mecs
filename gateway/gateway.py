@@ -12,9 +12,8 @@ class Translator():
     channel = None
 
     """ Open Connection """
-    def __init__(self):
+    def __init__(self, amqp_url):
         # Connect to RabbitMQ server
-        amqp_url = os.environ['AMQP_URL']
         print('URL: %s' % (amqp_url,))
         parameters = pika.URLParameters(amqp_url)
         connection = pika.BlockingConnection(parameters)
@@ -138,4 +137,5 @@ class Translator():
         print()
 
 if __name__ == "__main__":
-    translator = Translator()
+    amqp_url = os.environ['AMQP_URL'] if 'AMQP_URL' in os.environ else 'http://localhost'
+    translator = Translator(amqp_url)

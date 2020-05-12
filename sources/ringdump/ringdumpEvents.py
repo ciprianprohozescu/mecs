@@ -4,9 +4,8 @@ import json
 import time
 
 class RingDumpEvents:
-    def __init__(self, file_loc):
+    def __init__(self, amqp_url, file_loc):
         #RabbitMQ setup
-        amqp_url = os.environ['AMQP_URL']
         print('URL: %s' % (amqp_url,))
         parameters = pika.URLParameters(amqp_url)
         connection = pika.BlockingConnection(parameters)
@@ -41,5 +40,6 @@ class RingDumpEvents:
         print(" Closing connection...")
 
 if __name__ == "__main__":
-    ringdump_events = RingDumpEvents('ringdump.json')
+    amqp_url = os.environ['AMQP_URL'] if 'AMQP_URL' in os.environ else 'http://localhost'
+    ringdump_events = RingDumpEvents(amqp_url, 'ringdump.json')
     ringdump_events.message_loop()

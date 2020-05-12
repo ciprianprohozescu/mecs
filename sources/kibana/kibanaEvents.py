@@ -4,9 +4,8 @@ import json
 import time
 
 class KibanaEvents:
-    def __init__(self, file_loc):
+    def __init__(self, amqp_url, file_loc):
         #RabbitMQ setup
-        amqp_url = os.environ['AMQP_URL']
         print('URL: %s' % (amqp_url,))
         parameters = pika.URLParameters(amqp_url)
         connection = pika.BlockingConnection(parameters)
@@ -40,5 +39,6 @@ class KibanaEvents:
         connection.close()
 
 if __name__ == "__main__":
-    kibana_events = KibanaEvents('errors_last_3_hours.csv')
+    amqp_url = os.environ['AMQP_URL'] if 'AMQP_URL' in os.environ else 'http://localhost'
+    kibana_events = KibanaEvents(amqp_url, 'errors_last_3_hours.csv')
     kibana_events.message_loop()

@@ -5,10 +5,9 @@ import os
 
 
 class postWebEvents:
-    def __init__(self):
-        self.api_endpoint = os.environ['API_ENDPOINT']
+    def __init__(self, amqp_url, api_endpoint):
+        self.api_endpoint = api_endpoint
         #RabbitMQ setup
-        amqp_url = os.environ['AMQP_URL']
         parameters = pika.URLParameters(amqp_url)
         connection = pika.BlockingConnection(parameters)
 
@@ -28,4 +27,6 @@ class postWebEvents:
         print('[x] Event posted!')
 
 if __name__ == "__main__":
-    postweb = postWebEvents()
+    amqp_url = os.environ['AMQP_URL'] if 'AMQP_URL' in os.environ else 'http://localhost'
+    api_endpoint = os.environ['API_ENDPOINT'] if 'API_ENDPOINT' in os.environ else 'http://localhost:5000'
+    postweb = postWebEvents(amqp_url, api_endpoint)
