@@ -29,6 +29,7 @@ class Translator():
         self.channel.queue_bind(exchange = 'events-out', queue = 'out.storage')    
         self.channel.queue_bind(exchange = 'events-out', queue = 'out.web')  
 
+        #don't dispatch a message to a consumer until it has acknowledged the previous one
         self.channel.basic_qos(prefetch_count = 1)
 
         print('[x] Waiting for messages, to cancel press Ctrl + C')
@@ -37,20 +38,23 @@ class Translator():
         self.channel.basic_consume(queue = 'in.ringdump', on_message_callback = self.callback_ringdump)
         self.channel.basic_consume(queue = 'in.kibana', on_message_callback = self.callback_kibana)
         self.channel.basic_consume(queue = 'in.fake', on_message_callback = self.callback_fake)
-        self.channel.start_consuming()
+        try:
+            self.channel.start_consuming()
+        except KeyboardInterrupt:
+            pass
 
     """ Receives the message and calls for modification """
     def callback_ringdump(self, ch, method, properties, body):
-        ch.basic_ack(delivery_tag = method.delivery_tag)
         self.modify_ringdump(body)
+        ch.basic_ack(delivery_tag = method.delivery_tag)
 
     def callback_kibana(self, ch, method, properties, body):
-        ch.basic_ack(delivery_tag = method.delivery_tag)
         self.modify_kibana(body)
+        ch.basic_ack(delivery_tag = method.delivery_tag)
 
     def callback_fake(self, ch, method, properties, body):
-        ch.basic_ack(delivery_tag = method.delivery_tag)
         self.modify_fake(body)
+        ch.basic_ack(delivery_tag = method.delivery_tag)
 
     """ Ring dump modification - dropping unnecessary attributes """
     # rindgump's attributes are in the same order as in the template
