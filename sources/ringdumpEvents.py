@@ -29,10 +29,11 @@ print(" [x] Sent event!")
 try:
     while True:
         line = ringdump.readline()
+        if not line:
+            break
         event = json.loads(line)
-        while not 'time' in event:
-            line = ringdump.readline()
-            event = json.loads(line)
+        if not 'time' in event:
+            continue
         
         time.sleep((float(event['time']) - last_event_theoretical) / 1000)
 

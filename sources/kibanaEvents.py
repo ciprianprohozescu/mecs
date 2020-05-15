@@ -24,6 +24,8 @@ ringdump.readline()
 try:
     while True:
         line = ringdump.readline()
+        if not line:
+            break
         
         time.sleep(interval)
 

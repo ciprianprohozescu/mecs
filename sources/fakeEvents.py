@@ -18,6 +18,8 @@ print(" Sending events... press CTRL+C to terminate")
 try:
     while True:
         line = fakedump.readline()
+        if not line:
+            break
         event = json.loads(line)
 
         time.sleep(event['time_dif'] / 1000)
