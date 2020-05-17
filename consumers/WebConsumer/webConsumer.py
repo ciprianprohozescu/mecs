@@ -16,7 +16,11 @@ class postWebEvents:
         self.channel.basic_consume(queue = 'out.web', on_message_callback = self.postEvent)
 
         print(' Waiting for events... press CTRL+C to terminate')
-        self.channel.start_consuming()
+        try:
+            self.channel.start_consuming()
+        except KeyboardInterrupt:
+            print('Conneciton closed')
+            connection.close()
 
     def postEvent(self, channel, method, properties, body):
         try:
@@ -28,5 +32,5 @@ class postWebEvents:
 
 if __name__ == "__main__":
     amqp_url = os.environ['AMQP_URL'] if 'AMQP_URL' in os.environ else 'http://localhost'
-    api_endpoint = os.environ['API_ENDPOINT'] if 'API_ENDPOINT' in os.environ else 'http://localhost:5000'
+    api_endpoint = os.environ['API_ENDPOINT'] if 'API_ENDPOINT' in os.environ else 'http://localhost:5000/update'
     postweb = postWebEvents(amqp_url, api_endpoint)

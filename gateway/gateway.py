@@ -94,13 +94,12 @@ class Translator():
         #convert time column from date string to unix timestamp
         df['time'] = time.mktime(datetime.datetime.strptime(str(df.iloc[0]['time']), '%b %d, %Y @ %H:%M:%S.%f').timetuple())
         # create 'level' column and insert nan value
-        df['level'] = np.nan
+        df['level'] = "Normal"
         #convert the entire dataframe to a json object, then only take the first row
         df_message = df.to_json(orient = 'records')
         json_dict = json.loads(df_message)
-        message = json.dumps(json_dict[0])
-        print(message)
 
+        message = json.dumps(json_dict[0])
         self.send(message)
         
     """ Fake dump modification - adding, converting the attributes """
