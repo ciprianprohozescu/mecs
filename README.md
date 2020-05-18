@@ -61,7 +61,7 @@ To run the web client, you will need 3 separate services, run these in separate 
 
 ```python3 webApi.py``` in the *apis* directory
 
-```python webConsumer``` in *consumers/WebConsumer*
+```python3 webConsumer``` in *consumers/WebConsumer*
 
 
 ## Docker and docker swarm
