@@ -10,9 +10,6 @@ class Watcher:
         self.channel = connection.channel()
 
         self.gateway_instances = 1
-        self.database_instances = 1
-        self.web_instances = 1
-
 
     def check_queues(self, threshold):
         '''count queue sizes, rescale if they exceed thresholds'''
@@ -25,8 +22,6 @@ class Watcher:
         ringdump_count = ringdump_queue.method.message_count
         fake_count = fake_queue.method.message_count
         kibana_count = kibana_queue.method.message_count
-        storage_count = storage_queue.method.message_count
-        web_count = web_queue.method.message_count
 
         if any((ringdump_count > threshold), (fake_count > threshold), (kibana_count > threshold)):
             self.gateway_instances += 1
