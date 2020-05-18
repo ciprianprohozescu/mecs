@@ -18,7 +18,11 @@ class StoreEvents:
         channel.basic_consume(queue = 'out.storage', on_message_callback = self.storeEvent)
 
         print(' Waiting for events... press CTRL+C to terminate')
-        channel.start_consuming()
+        try:
+            channel.start_consuming()
+        except KeyboardInterrupt:
+            print(' Connection closed')
+            connection.close()
 
     def event_insert(self, event):
         sql_insert = f"""INSERT INTO events (time, node, event, level) VALUES 

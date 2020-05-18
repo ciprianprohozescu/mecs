@@ -19,7 +19,7 @@ class postWebEvents:
         try:
             self.channel.start_consuming()
         except KeyboardInterrupt:
-            print('Conneciton closed')
+            print(' Connection closed')
             connection.close()
 
     def postEvent(self, channel, method, properties, body):
