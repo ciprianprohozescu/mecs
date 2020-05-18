@@ -18,9 +18,9 @@ class Fake_Event_Data_Gen:
         #RabbitMQ setup
         print('URL: %s' % (amqp_url,))
         parameters = pika.URLParameters(amqp_url)
-        connection = pika.BlockingConnection(parameters)
+        self.connection = pika.BlockingConnection(parameters)
 
-        self.channel = connection.channel()
+        self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange = 'events-in', exchange_type = 'direct')
         self.channel.queue_declare(queue = 'in.fake', auto_delete = True)
         self.channel.queue_bind(exchange = 'events-in', queue = 'in.fake', routing_key = 'in.fake')
