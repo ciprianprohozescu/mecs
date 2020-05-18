@@ -1,20 +1,22 @@
 import pika
+import os
 import json
-import pandas as pd
-import numpy as np
 import sys
 import time
 import datetime
+import pandas as pd
+import numpy as np
 from io import BytesIO
     
 class Translator():
     channel = None
 
     """ Open Connection """
-    def __init__(self):
+    def __init__(self, amqp_url):
         # Connect to RabbitMQ server
-        connection = pika.BlockingConnection(
-        pika.ConnectionParameters(host='localhost'))
+        print('URL: %s' % (amqp_url,))
+        parameters = pika.URLParameters(amqp_url)
+        connection = pika.BlockingConnection(parameters)
         self.channel = connection.channel()
         self.channel.queue_declare(queue = 'in.ringdump', auto_delete = True)
         self.channel.queue_declare(queue = 'in.kibana', auto_delete = True)
@@ -92,13 +94,12 @@ class Translator():
         #convert time column from date string to unix timestamp
         df['time'] = time.mktime(datetime.datetime.strptime(str(df.iloc[0]['time']), '%b %d, %Y @ %H:%M:%S.%f').timetuple())
         # create 'level' column and insert nan value
-        df['level'] = np.nan
+        df['level'] = "Normal"
         #convert the entire dataframe to a json object, then only take the first row
         df_message = df.to_json(orient = 'records')
         json_dict = json.loads(df_message)
-        message = json.dumps(json_dict[0])
-        print(message)
 
+        message = json.dumps(json_dict[0])
         self.send(message)
         
     """ Fake dump modification - adding, converting the attributes """
@@ -133,5 +134,7 @@ class Translator():
         print(message)
         print("[x] Sent event!")
         print()
-    
-translator = Translator()
+
+if __name__ == "__main__":
+    amqp_url = os.environ['AMQP_URL'] if 'AMQP_URL' in os.environ else 'http://localhost'
+    translator = Translator(amqp_url)

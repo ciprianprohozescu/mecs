@@ -44,13 +44,13 @@ def check_queues():
         print()
         print(" [x] Starting a new storage worker...")
         print()
-        new_scripts.append(subprocess.Popen(['python3', '../consumers/storeEvents.py']))
+        new_scripts.append(subprocess.Popen(['python3', '../consumers/Database/storeEvents.py']))
     
     if web_count > threshold:
         print()
         print(" [x] Starting a new web worker...")
         print()
-        new_scripts.append(subprocess.Popen(['python3', '../consumers/webConsumer.py']))
+        new_scripts.append(subprocess.Popen(['python3', '../consumers/WebConsumer/webConsumer.py']))
 
 def kill_all_children():
     for script in new_scripts:
