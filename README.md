@@ -139,7 +139,7 @@ docker stack deploy --compose-file docker-compose.yml
 Test by looking for the sqlite database, and checking for the website at the address that the web client service is running
 
 ### Scalability
-Unfortunately it takes a very high load to overcome the gateway image, for testing purposes we will be switching exclusively to kibana events, and changing the gateway image to a version that takes a full process kibana events.
+Unfortunately it takes a very high load to overcome the gateway image, for testing purposes we will be switching exclusively to kibana events, and changing the gateway image to a version that takes a full second to process kibana events.
 
 Begin by swapping the gateway image for ```badgateway```
 
