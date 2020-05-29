@@ -1,7 +1,6 @@
 FROM python:3
 
 RUN pip install pika
-RUN pip install pandas
 
 ENV PYTHONUNBUFFERED=1
 
