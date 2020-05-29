@@ -24,7 +24,7 @@ class DatabaseSetup:
 
 
 if __name__ == "__main__":
-    db_loc = os.environ['SQLITE_DB_LOC']
+    db_loc = os.environ['SQLITE_DB_LOC'] if 'SQLITE_DB_LOC' in os.environ else './sqlite_db'
     # set up a database if one doesn't exist
     dbsetup = DatabaseSetup(db_loc)
     print('removing old database')

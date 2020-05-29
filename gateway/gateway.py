@@ -4,8 +4,7 @@ import json
 import sys
 import time
 import datetime
-import pandas as pd
-import numpy as np
+import re
 from io import BytesIO
     
 class Translator():
@@ -86,21 +85,15 @@ class Translator():
                     'syslog_facility', 'syslog_facility_code', 'syslog_hostname', 'syslog_pri',
                     'syslog_severity', 'syslog_severity_code', 'syslog_timestamp', 'tags', 'type']
 
-        kibana_line = BytesIO(message)
-        # create a dataframe object, it is because I need labels
-        df = pd.read_csv(kibana_line, sep = ',', names = col_names)
-        # take only the necessary labels and re-arrange them
-        df = df.loc[:, ['time', 'node', 'event']]
-        #convert time column from date string to unix timestamp
-        df['time'] = time.mktime(datetime.datetime.strptime(str(df.iloc[0]['time']), '%b %d, %Y @ %H:%M:%S.%f').timetuple())
-        # create 'level' column and insert nan value
-        df['level'] = "Normal"
-        #convert the entire dataframe to a json object, then only take the first row
-        df_message = df.to_json(orient = 'records')
-        json_dict = json.loads(df_message)
+        kibana_line = message.decode("utf-8")
+        parsed_line = re.findall(r'\"(?P<unit>.+?)\"', kibana_line)
+        message = {}
+        message['time'] = time.mktime(datetime.datetime.strptime(parsed_line[2], '%b %d, %Y @ %H:%M:%S.%f').timetuple())
+        message['node'] = parsed_line[0]
+        message['event'] = parsed_line[1]
+        message['level'] = "Normal"
 
-        message = json.dumps(json_dict[0])
-        self.send(message)
+        self.send(json.dumps(message))
         
     """ Fake dump modification - adding, converting the attributes """
     def modify_fake(self, message):
