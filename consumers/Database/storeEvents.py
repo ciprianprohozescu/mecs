@@ -31,9 +31,12 @@ class StoreEvents:
 
     def storeEvent(self, channel, method, properties, body):
         event = json.loads(body)
-        self.event_insert(event)
+        try:
+            self.event_insert(event)
+            print('[x] Event stored!')
+        except:
+            print('[x] Error')
         channel.basic_ack(delivery_tag = method.delivery_tag)
-        print('[x] Event stored!')
 
 
 if __name__ == "__main__":
