@@ -13,11 +13,11 @@ class Watcher:
 
     def check_queues(self, threshold):
         '''count queue sizes, rescale if they exceed thresholds'''
-        ringdump_queue = self.channel.queue_declare(queue = 'in.ringdump', auto_delete = True)
-        fake_queue = self.channel.queue_declare(queue = 'in.fake', auto_delete = True)
-        kibana_queue = self.channel.queue_declare(queue = 'in.kibana', auto_delete = True)
-        storage_queue = self.channel.queue_declare(queue = 'out.storage', durable = True, auto_delete = True)
-        web_queue = self.channel.queue_declare(queue = 'out.web', durable = True, auto_delete = True)
+        ringdump_queue = self.channel.queue_declare(queue = 'in.ringdump', durable = True)
+        fake_queue = self.channel.queue_declare(queue = 'in.fake', durable = True)
+        kibana_queue = self.channel.queue_declare(queue = 'in.kibana', durable = True)
+        storage_queue = self.channel.queue_declare(queue = 'out.storage', durable = True)
+        web_queue = self.channel.queue_declare(queue = 'out.web', durable = True)
 
         ringdump_count = ringdump_queue.method.message_count
         fake_count = fake_queue.method.message_count
