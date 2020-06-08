@@ -14,11 +14,11 @@ interval = int(sys.argv[2]) if len(sys.argv) > 2 else 2
 new_scripts = []
 
 def check_queues():
-    ringdump_queue = channel.queue_declare(queue = 'in.ringdump', auto_delete = True)
-    fake_queue = channel.queue_declare(queue = 'in.fake', auto_delete = True)
-    kibana_queue = channel.queue_declare(queue = 'in.kibana', auto_delete = True)
-    storage_queue = channel.queue_declare(queue = 'out.storage', durable = True, auto_delete = True)
-    web_queue = channel.queue_declare(queue = 'out.web', durable = True, auto_delete = True)
+    ringdump_queue = channel.queue_declare(queue = 'in.ringdump', durable = True)
+    fake_queue = channel.queue_declare(queue = 'in.fake', durable = True)
+    kibana_queue = channel.queue_declare(queue = 'in.kibana', durable = True)
+    storage_queue = channel.queue_declare(queue = 'out.storage', durable = True)
+    web_queue = channel.queue_declare(queue = 'out.web', durable = True)
 
     ringdump_count = ringdump_queue.method.message_count
     fake_count = fake_queue.method.message_count

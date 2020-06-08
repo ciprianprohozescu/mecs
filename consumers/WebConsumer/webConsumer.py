@@ -12,7 +12,7 @@ class postWebEvents:
         connection = pika.BlockingConnection(parameters)
 
         self.channel = connection.channel()
-        self.channel.queue_declare(queue = 'out.web', durable = True, auto_delete = True)
+        self.channel.queue_declare(queue = 'out.web', durable = True)
         self.channel.basic_consume(queue = 'out.web', on_message_callback = self.postEvent)
 
         print(' Waiting for events... press CTRL+C to terminate')

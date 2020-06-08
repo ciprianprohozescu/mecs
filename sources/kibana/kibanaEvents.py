@@ -21,7 +21,7 @@ class KibanaEvents:
 
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange = 'events-in', exchange_type = 'direct')
-        self.channel.queue_declare(queue = 'in.kibana', auto_delete = True)
+        self.channel.queue_declare(queue = 'in.kibana', durable = True)
         self.channel.queue_bind(exchange = 'events-in', queue = 'in.kibana', routing_key = 'in.kibana')
 
         self.file_loc = file_loc

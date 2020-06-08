@@ -14,7 +14,7 @@ class StoreEvents:
         connection = pika.BlockingConnection(parameters)
 
         channel = connection.channel()
-        channel.queue_declare(queue = 'out.storage', durable = True, auto_delete = True)
+        channel.queue_declare(queue = 'out.storage', durable = True)
         channel.basic_consume(queue = 'out.storage', on_message_callback = self.storeEvent)
 
         print(' Waiting for events... press CTRL+C to terminate')

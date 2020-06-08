@@ -18,7 +18,7 @@ class Api_Listener():
         self.channel = self.connection.channel()
 
         self.channel.exchange_declare(exchange='events-in', exchange_type='direct')
-        self.channel.queue_declare(queue = 'in.fake', auto_delete = True)
+        self.channel.queue_declare(queue = 'in.fake', durable = True)
         self.channel.queue_bind(exchange='events-in', queue='in.fake', routing_key='in.fake')
     
     def receive_data(self):

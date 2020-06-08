@@ -21,7 +21,7 @@ class RingDumpEvents:
 
         self.channel = self.connection.channel()
         self.channel.exchange_declare(exchange = 'events-in', exchange_type = 'direct')
-        self.channel.queue_declare(queue = 'in.ringdump', auto_delete = True)
+        self.channel.queue_declare(queue = 'in.ringdump', durable = True)
         self.channel.queue_bind(exchange = 'events-in', queue = 'in.ringdump', routing_key = 'in.ringdump')
 
         self.file_loc = file_loc
